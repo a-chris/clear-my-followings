@@ -1,39 +1,47 @@
-import { CSSReset, theme, ThemeProvider } from '@chakra-ui/core';
+import {
+    ColorModeProvider,
+    CSSReset,
+    theme,
+    ThemeProvider,
+} from '@chakra-ui/core';
+import Header from 'components/Header';
 import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
-import { Route, Router, Switch } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Homepage from './pages/Homepage';
+// import RedditFollowings from './pages/reddit/RedditFollowings';
 
 const RedditFollowings = React.lazy(() =>
     import('pages/reddit/RedditFollowings')
 );
 
-function App(props: { history: any }) {
-    const { history } = props;
+function App() {
     return (
         <div className='App'>
             <ThemeProvider theme={theme}>
-                <CSSReset />
-                <Router history={history}>
-                    <Switch>
-                        <Route exact path='/' component={Homepage} />
-                        <Route
-                            exact
-                            path='/reddit/authorize_callback'
-                            component={CallbackReceiver}
-                        />
-                        <Route
-                            exact
-                            path='/reddit/followings'
-                            render={() => (
-                                <Suspense fallback={<div>Loading...</div>}>
-                                    <RedditFollowings />
-                                </Suspense>
-                            )}
-                        />
-                    </Switch>
-                </Router>
+                <ColorModeProvider>
+                    <CSSReset />
+                    <BrowserRouter>
+                        <Header />
+                        <Switch>
+                            <Route exact path='/' component={Homepage} />
+                            <Route
+                                exact
+                                path='/reddit/authorize_callback'
+                                component={CallbackReceiver}
+                            />
+                            <Route
+                                exact
+                                path='/reddit'
+                                render={() => (
+                                    <Suspense fallback={<div>Loading...</div>}>
+                                        <RedditFollowings />
+                                    </Suspense>
+                                )}
+                            />
+                        </Switch>
+                    </BrowserRouter>
+                </ColorModeProvider>
             </ThemeProvider>
         </div>
     );

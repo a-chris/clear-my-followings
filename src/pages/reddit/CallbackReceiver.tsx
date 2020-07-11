@@ -27,12 +27,12 @@ export default function CallbackReceiver() {
             .then((reddit) => {
                 console.log('TCL: CallbackReceiver -> reddit', reddit);
                 saveToken('reddit', reddit.accessToken);
-                history.push('/reddit/followings');
+                history.push('/reddit');
             })
             .catch((reason: any) => {
                 if (reason.toString().includes('invalid_grant')) {
                     // already grant authorization
-                    history.push('/reddit/followings');
+                    history.push('/reddit');
                 }
             });
     }, [history]);

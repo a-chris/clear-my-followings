@@ -1,14 +1,12 @@
-import { createBrowserHistory } from 'history';
+import 'mobx-react-lite/batchingForReactDom';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-const history = createBrowserHistory();
-
 ReactDOM.render(
     <React.StrictMode>
-        <App history={history} />
+        <App />
     </React.StrictMode>,
     document.getElementById('root')
 );
