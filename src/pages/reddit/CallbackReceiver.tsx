@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import snoowrap from 'snoowrap';
-import { CLIENT_ID_INSTALLED, REDIRECT, USER_AGENT } from 'utils/const';
+import { CLIENT_ID_INSTALLED, REDIRECT_URL, USER_AGENT } from 'utils/const';
 
 export default function CallbackReceiver() {
     const history = useHistory();
@@ -22,7 +22,7 @@ export default function CallbackReceiver() {
                 code: loadToken('reddit')!!,
                 userAgent: USER_AGENT,
                 clientId: CLIENT_ID_INSTALLED,
-                redirectUri: REDIRECT,
+                redirectUri: REDIRECT_URL,
             })
             .then((reddit) => {
                 console.log('TCL: CallbackReceiver -> reddit', reddit);

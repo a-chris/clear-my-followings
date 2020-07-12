@@ -5,6 +5,7 @@ import {
     AccordionItem,
     AccordionPanel,
     Avatar,
+    Badge,
     Box,
     Button,
     Checkbox,
@@ -16,19 +17,19 @@ import {
     Spinner,
     Stack,
     Switch,
-    Tag,
     Text,
     useToast,
 } from '@chakra-ui/core';
 import { BoxWithSpacedChildren } from 'components/Styled';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
-import { spy } from 'mobx';
 import { useLocalStore, useObserver } from 'mobx-react-lite';
 import React from 'react';
 import LazyLoad from 'react-lazyload';
 import { useHistory } from 'react-router-dom';
+import { createBreakpoint } from 'react-use';
 import snoowrap from 'snoowrap';
+import colors from '../../styles/colors';
 import RedditAPI from './api';
 
 interface RedditSwitchFilter {
@@ -49,17 +50,11 @@ const initialFilters: RedditFilters = {
     'inactive': false,
 };
 
+const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });
+
 export default function RedditFollowings() {
     const history = useHistory();
     const toast = useToast();
-
-    React.useEffect(() => {
-        spy((event) => {
-            if (event.type === 'action' || event.type === 'compute') {
-                console.log(`${event.name} with args: ${event.arguments}`);
-            }
-        });
-    }, []);
 
     function onUnauthorizedError() {
         history.push('/');
@@ -74,9 +69,6 @@ export default function RedditFollowings() {
 
     const store = useLocalStore(() => ({
         subs: new Array<snoowrap.Subreddit>(),
-        setSubs(value: snoowrap.Subreddit[]) {
-            store.subs = value;
-        },
         isLoading: false,
         filters: initialFilters,
         toggleNsfw() {
@@ -119,17 +111,14 @@ export default function RedditFollowings() {
         },
         search: '',
         onSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-            if (e.target.value != null) {
-                store.search = e.target.value;
-            }
+            store.search = e.target.value ?? '';
         },
         checkedSubs: new Set<string>(),
         onCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
             const { checked, name } = e.target;
             if (checked != null && name != null) {
-                store.checkedSubs = checked
-                    ? new Set([...store.checkedSubs, name])
-                    : new Set(_.without(Array.from(store.checkedSubs), name));
+                if (checked) store.checkedSubs.add(name);
+                else store.checkedSubs.delete(name);
             }
         },
         disabledUsers: new Set<string>(),
@@ -165,14 +154,14 @@ export default function RedditFollowings() {
     }));
 
     React.useEffect(() => {
-        // store.setSubs(castedDevSubs);
+        // store.subs = (devSubs as unknown) as snoowrap.Subreddit[];
         const getSubscriptions = async () => {
             store.isLoading = true;
             try {
                 const subs = await RedditAPI.get()
                     .getSubscriptions()
                     .fetchAll();
-                store.setSubs(_.sortBy(subs, 'display_name_prefixed'));
+                store.subs = _.sortBy(subs, 'display_name_prefixed');
             } catch (error) {
                 onUnauthorizedError();
             } finally {
@@ -187,17 +176,13 @@ export default function RedditFollowings() {
         const visibleNames = store.subsToDisplay?.map((s) => s.display_name);
         if (visibleNames != null) {
             visibleNames.forEach((s) => store.checkedSubs.add(s));
-            // store.checkedSubs = new Set([
-            //     ...store.checkedSubs,
-            //     ...visibleNames,
-            // ]);
         }
     }, [store.checkedSubs, store.subsToDisplay]);
 
     const onUnselectAll = React.useCallback(() => {
         const visibleNames = store.subsToDisplay?.map((s) => s.display_name);
         if (visibleNames != null) {
-            _.difference(
+            _.intersection(
                 Array.from(store.checkedSubs),
                 visibleNames
             ).forEach((s) => store.checkedSubs.delete(s));
@@ -270,6 +255,7 @@ export default function RedditFollowings() {
                                             name={filter.id}
                                             size='lg'
                                             isChecked={store.filters[filter.id]}
+                                            color='orange'
                                             onChange={filter.onChange}
                                         />
                                     </Flex>
@@ -280,23 +266,28 @@ export default function RedditFollowings() {
                     {store.isLoading ? (
                         <Flex h='100%' dir='row' justify='center'>
                             <Spinner
+                                mt='50%'
                                 thickness='4px'
                                 speed='0.5s'
                                 emptyColor='gray.200'
-                                color='blue.500'
+                                color={colors.reddit_orange}
                                 size='xl'
                             />
                         </Flex>
                     ) : (
-                        <LazyLoad once height='auto'>
+                        <>
                             {store.subsToDisplay.map((s) => (
-                                <SubredditListItem
-                                    sub={s}
-                                    checkedSubs={store.checkedSubs}
-                                    onCheckboxChange={store.onCheckboxChange}
-                                />
+                                <LazyLoad once height='auto' key={s.name}>
+                                    <SubredditListItem
+                                        sub={s}
+                                        checkedSubs={store.checkedSubs}
+                                        onCheckboxChange={
+                                            store.onCheckboxChange
+                                        }
+                                    />
+                                </LazyLoad>
                             ))}
-                        </LazyLoad>
+                        </>
                     )}
                 </BoxWithSpacedChildren>
             </Box>
@@ -306,7 +297,7 @@ export default function RedditFollowings() {
                 bottom='0'
                 w='100%'
                 h='50px'
-                backgroundColor='red.300'
+                backgroundColor='orange.400'
                 zIndex={100}>
                 <Flex justify='space-evenly' w='100%'>
                     <Button size='sm' onClick={onSelectAll}>
@@ -335,13 +326,15 @@ interface SubredditListItemProps {
 
 function SubredditListItem(props: SubredditListItemProps) {
     const { sub, checkedSubs, onCheckboxChange } = props;
+    const breakpoint = useBreakpoint();
+
     return (
         <Flex
             w='100%'
             justifyContent='space-between'
-            p='1'
-            pl='6'
-            pr='6'
+            p='2'
+            pl={['3', null, '6']}
+            pr={['3', null, '6']}
             border='1px solid gray'
             rounded='md'
             key={sub.name}>
@@ -350,27 +343,31 @@ function SubredditListItem(props: SubredditListItemProps) {
                     <Avatar
                         src={sub.icon_img}
                         name={sub.display_name_prefixed}
-                        mr='20px'
+                        size='md'
+                        mr={['10px', null, '20px']}
                     />
                 </LazyLoad>
-                <Heading as='h3' size='md'>
+                <Heading as='h3' size={breakpoint === 'SM' ? 'sm' : 'md'}>
                     <Link
                         href={memoizedGetSubLink(sub.display_name)}
                         isExternal>
-                        {sub.display_name_prefixed}
+                        {memoizedEllipseSubName(
+                            sub.display_name_prefixed,
+                            sub.over18
+                        )}
                     </Link>
                 </Heading>
                 {sub.over18 === true && (
-                    <Tag ml='20px' variantColor='orange' size='sm'>
+                    <Badge ml={['10px', null, '20px']} variantColor='orange'>
                         NSFW
-                    </Tag>
+                    </Badge>
                 )}
             </Flex>
             <Checkbox
                 isChecked={checkedSubs.has(sub.display_name)}
                 variantColor='red'
                 name={sub.display_name}
-                size='lg'
+                size={breakpoint === 'SM' ? 'md' : 'lg'}
                 onChange={onCheckboxChange}
             />
         </Flex>
@@ -380,6 +377,8 @@ function SubredditListItem(props: SubredditListItemProps) {
 const memoizedGetSubLink = memoizeOne(calculateSubLink);
 
 const memoizedGetSubName = memoizeOne(getSubName);
+
+const memoizedEllipseSubName = memoizeOne(ellipseSubName);
 
 function getSubName(displayName: string): string {
     return displayName.startsWith('u_')
@@ -393,4 +392,11 @@ function calculateSubLink(subName: string): string {
         : `r/${subName}`;
 
     return `https://www.reddit.com/${profile}`;
+}
+
+function ellipseSubName(subName: string, nsfw: boolean): string {
+    const maxLength = nsfw ? 18 : 23;
+    return subName.length > maxLength
+        ? `${subName.substring(0, maxLength)}...`
+        : subName;
 }

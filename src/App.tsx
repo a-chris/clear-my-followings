@@ -8,8 +8,9 @@ import Header from 'components/Header';
 import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Homepage from './pages/Homepage';
 // import RedditFollowings from './pages/reddit/RedditFollowings';
+import About from './pages/about/About';
+import Homepage from './pages/Homepage';
 
 const RedditFollowings = React.lazy(() =>
     import('pages/reddit/RedditFollowings')
@@ -39,6 +40,7 @@ function App() {
                                     </Suspense>
                                 )}
                             />
+                            <Route exact path='/about' component={About} />
                         </Switch>
                     </BrowserRouter>
                 </ColorModeProvider>

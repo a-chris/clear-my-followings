@@ -23,8 +23,8 @@ const PAGES = [
         name: 'Reddit',
     },
     {
-        path: '/test',
-        name: 'Test',
+        path: '/about',
+        name: 'About',
     },
 ];
 
@@ -38,7 +38,6 @@ export default function Header() {
             w='100%'
             justifyContent='space-evenly'
             alignItems='center'>
-            <Box />
             <Breadcrumb fontWeight='medium' fontSize='md'>
                 {PAGES.map((page) => (
                     <BreadcrumbItem
@@ -55,7 +54,7 @@ export default function Header() {
                     variant='ghost'
                     aria-label='toggle color mode'
                     isRound
-                    size='lg'
+                    size='md'
                     icon={colorMode === 'light' ? FiMoon : FiSun}
                     onClick={toggleColorMode}
                 />
