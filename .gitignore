@@ -22,6 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+vsc.code-workspace
 .vscode/*
 src/dev/*
 *.ppk
