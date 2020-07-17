@@ -6,12 +6,14 @@ import {
     Flex,
     IconButton,
     Link,
+    Tooltip,
     useColorMode,
 } from '@chakra-ui/core';
 import React from 'react';
 import { AiFillGithub } from 'react-icons/ai';
 import { FiMoon, FiSun } from 'react-icons/fi';
-import { useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import colors from 'styles/colors';
 
 const PAGES = [
     {
@@ -43,25 +45,46 @@ export default function Header() {
                     <BreadcrumbItem
                         isCurrentPage={location.pathname === page.path}
                         key={page.path}>
-                        <BreadcrumbLink href={page.path}>
-                            {page.name}
+                        <BreadcrumbLink
+                            as='div'
+                            style={{
+                                fontWeight:
+                                    location.pathname === page.path
+                                        ? 'bold'
+                                        : 'inherit',
+                                color:
+                                    location.pathname === page.path
+                                        ? colors.reddit_orange
+                                        : 'inherit',
+                            }}>
+                            <RouterLink to={page.path}>{page.name}</RouterLink>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 ))}
             </Breadcrumb>
             <Flex alignItems='center'>
-                <IconButton
-                    variant='ghost'
-                    aria-label='toggle color mode'
-                    isRound
-                    size='md'
-                    icon={colorMode === 'light' ? FiMoon : FiSun}
-                    onClick={toggleColorMode}
-                />
+                <Tooltip
+                    closeOnClick
+                    label='Change theme'
+                    aria-label='Change theme'>
+                    <IconButton
+                        variant='ghost'
+                        aria-label='toggle color mode'
+                        isRound
+                        size='md'
+                        icon={colorMode === 'light' ? FiMoon : FiSun}
+                        onClick={toggleColorMode}
+                    />
+                </Tooltip>
                 <Box w='20px' />
-                <Link href='https://github.com/' isExternal>
-                    <Box as={AiFillGithub} size='32px' />
-                </Link>
+                <Tooltip
+                    closeOnClick
+                    label='Visit the repository'
+                    aria-label='Visit the repository'>
+                    <Link href='https://github.com/' isExternal>
+                        <Box as={AiFillGithub} size='32px' />
+                    </Link>
+                </Tooltip>
             </Flex>
         </Flex>
     );
