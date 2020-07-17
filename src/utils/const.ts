@@ -6,3 +6,5 @@ export const REDIRECT_URL = `${process.env.REACT_APP_REDIRECT_BASE_URL}/reddit/a
 export const SCOPES = 'mysubreddits,read,history,subscribe';
 
 export const REDDIT_LOGIN = `https://www.reddit.com/api/v1/authorize?client_id=${CLIENT_ID_INSTALLED}&response_type=code&state=${STATE}&redirect_uri=${REDIRECT_URL}&duration=temporary&scope=${SCOPES}`;
+
+export const GITHUB_REPO = 'https://github.com/a-chris/clear-my-followings';

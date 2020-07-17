@@ -15,6 +15,7 @@ import { AiFillGithub } from 'react-icons/ai';
 import { FiMoon, FiSun } from 'react-icons/fi';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import colors from 'styles/colors';
+import { GITHUB_REPO } from 'utils/const';
 
 const PAGES = [
     {
@@ -41,8 +42,12 @@ export default function Header() {
         <Flex
             h='80px'
             w='100%'
+            position='fixed'
             justifyContent='space-evenly'
-            alignItems='center'>
+            alignItems='center'
+            bg={colorMode === 'light' ? 'white' : 'gray.800'}
+            zIndex={100}
+            boxShadow='0 0 5px rgba(57, 63, 72, 0.3)'>
             <Breadcrumb fontWeight='medium' fontSize='md'>
                 {PAGES.map((page) => (
                     <BreadcrumbItem
@@ -79,19 +84,19 @@ export default function Header() {
                         onClick={toggleColorMode}
                     />
                 </Tooltip>
-                <Box w='20px' />
                 <Tooltip
                     closeOnClick
                     label='Visit the repository'
                     aria-label='Visit the repository'>
-                    <Link
-                        href='https://github.com/a-chris/clear-my-followings'
-                        isExternal>
+                    <Link ml='20px' href={GITHUB_REPO} isExternal>
                         <Box as={AiFillGithub} size='32px' />
                     </Link>
                 </Tooltip>
-                <Box w='20px' />
-                <Text fontFamily='monospace' fontWeight='bold'>
+                <Text
+                    d={['none', 'block']}
+                    fontFamily='monospace'
+                    fontWeight='bold'
+                    ml='20px'>
                     v1.0.{CURRENT_VERSION}
                 </Text>
             </Flex>

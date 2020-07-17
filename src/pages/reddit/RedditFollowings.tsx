@@ -368,6 +368,9 @@ function SubredditListItem(props: SubredditListItemProps) {
                 variantColor='red'
                 name={sub.display_name}
                 size={breakpoint === 'SM' ? 'md' : 'lg'}
+                w='fit-content'
+                mt='auto'
+                mb='auto'
                 onChange={onCheckboxChange}
             />
         </Flex>

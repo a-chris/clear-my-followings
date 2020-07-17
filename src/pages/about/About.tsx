@@ -1,4 +1,4 @@
-import { Box, Flex, Image, Link, Stack, Text } from '@chakra-ui/core';
+import { Box, Flex, Grid, Image, Link, Stack, Text } from '@chakra-ui/core';
 import React from 'react';
 
 const TECHNOLOGIES = [
@@ -28,25 +28,28 @@ const TECHNOLOGIES = [
 
 export default function About() {
     return (
-        <Stack d='flex' align='center'>
+        <Stack d='flex' align='center' pb='20px'>
             <Box
-                w={['50%', null, '40%']}
-                mt='80px'
-                fontSize='xl'
-                lineHeight='1.5'
-                textAlign='left'>
-                I created this site mostly because I got tired to find inactive
-                users in my followings and I felt very unsatisfied with the
-                current followings management of Reddit, so here we go.
+                w={['80%', '50%', null, '40%']}
+                mt={['20px', '60px']}
+                fontSize='lg'
+                lineHeight='1.5'>
+                <Text>
+                    I created this site mostly because I got tired to find
+                    inactive users in my followings and I felt very unsatisfied
+                    with the current followings management of Reddit.
+                </Text>
             </Box>
-            <Box mt='60px'>
-                <Box
-                    d='grid'
-                    gridTemplateColumns='repeat(2, 1fr)'
-                    gridGap='40px'>
+            <Box mt={['30px', null, '60px']}>
+                <Grid
+                    templateColumns={['1fr', null, 'repeat(2, 1fr)']}
+                    gap={['20px', null, '40px']}>
                     {TECHNOLOGIES.map((t) => (
-                        <Flex alignItems='center' key={t.name}>
-                            <Link href={t.link} isExternal>
+                        <Flex
+                            alignItems='center'
+                            justify={['center', null]}
+                            key={t.name}>
+                            <Link href={t.link} isExternal _hover={undefined}>
                                 {t.img ? (
                                     t.addNameToImg ? (
                                         <Flex dir='row'>
@@ -77,9 +80,12 @@ export default function About() {
                             </Link>
                         </Flex>
                     ))}
-                </Box>
+                </Grid>
             </Box>
-            <Text mt='60px' textAlign='center' fontWeight='bold'>
+            <Text
+                mt={['20px', null, '60px']}
+                textAlign='center'
+                fontWeight='bold'>
                 written with{' '}
                 <span role='img' aria-label='hearth'>
                     ❤️
