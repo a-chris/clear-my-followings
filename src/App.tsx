@@ -8,7 +8,6 @@ import Header from 'components/Header';
 import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-// import RedditFollowings from './pages/reddit/RedditFollowings';
 import About from './pages/about/About';
 import Homepage from './pages/Homepage';
 
@@ -16,7 +15,7 @@ const RedditFollowings = React.lazy(() =>
     import('pages/reddit/RedditFollowings')
 );
 
-function App() {
+export default function App() {
     return (
         <div className='App'>
             <ThemeProvider theme={theme}>
@@ -48,5 +47,3 @@ function App() {
         </div>
     );
 }
-
-export default App;
