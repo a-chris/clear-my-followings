@@ -6,6 +6,7 @@ import {
     Flex,
     IconButton,
     Link,
+    Text,
     Tooltip,
     useColorMode,
 } from '@chakra-ui/core';
@@ -29,6 +30,8 @@ const PAGES = [
         name: 'About',
     },
 ];
+
+const CURRENT_VERSION = process.env.REACT_APP_BUILD;
 
 export default function Header() {
     const location = useLocation();
@@ -81,10 +84,16 @@ export default function Header() {
                     closeOnClick
                     label='Visit the repository'
                     aria-label='Visit the repository'>
-                    <Link href='https://github.com/' isExternal>
+                    <Link
+                        href='https://github.com/a-chris/clear-my-followings'
+                        isExternal>
                         <Box as={AiFillGithub} size='32px' />
                     </Link>
                 </Tooltip>
+                <Box w='20px' />
+                <Text fontFamily='monospace' fontWeight='bold'>
+                    v1.0.{CURRENT_VERSION}
+                </Text>
             </Flex>
         </Flex>
     );

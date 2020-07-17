@@ -24,3 +24,5 @@ yarn-error.log*
 
 .vscode/*
 src/dev/*
+*.ppk
+upload_script.js
