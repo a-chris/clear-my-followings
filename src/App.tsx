@@ -21,7 +21,6 @@ export default function App() {
                         <Header />
                         <div style={{ paddingTop: '80px' }}>
                             <Switch>
-                                <Route exact path='/' component={Home} />
                                 <Route
                                     exact
                                     path='/reddit/authorize_callback'
@@ -38,6 +37,7 @@ export default function App() {
                                     )}
                                 />
                                 <Route exact path='/about' component={About} />
+                                <Route component={Home} />
                             </Switch>
                         </div>
                     </BrowserRouter>
