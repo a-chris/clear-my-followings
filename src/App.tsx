@@ -1,4 +1,9 @@
-import { ColorModeProvider, CSSReset, ThemeProvider } from '@chakra-ui/core';
+import {
+    ColorModeProvider,
+    CSSReset,
+    Text,
+    ThemeProvider,
+} from '@chakra-ui/core';
 import Header from 'components/Header';
 import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
@@ -31,7 +36,7 @@ export default function App() {
                                     path='/reddit'
                                     render={() => (
                                         <Suspense
-                                            fallback={<div>Loading...</div>}>
+                                            fallback={<Text>Loading...</Text>}>
                                             <RedditFollowings />
                                         </Suspense>
                                     )}

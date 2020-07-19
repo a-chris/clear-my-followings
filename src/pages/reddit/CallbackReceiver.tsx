@@ -1,3 +1,4 @@
+import { Box, Heading, Text } from '@chakra-ui/core';
 import { loadToken, saveToken } from 'cache/StorageHelper';
 import queryString from 'query-string';
 import React from 'react';
@@ -10,13 +11,11 @@ export default function CallbackReceiver() {
     const { search } = useLocation();
     const query = queryString.parse(search);
 
-    console.log('TCL: CallbackReceiver -> search', query);
     if (query.code != null && loadToken('reddit') !== query.code) {
         saveToken('reddit', query.code.toString());
     }
 
     React.useEffect(() => {
-        console.log('TCL: CallbackReceiver -> useEffect');
         snoowrap
             .fromAuthCode({
                 code: loadToken('reddit')!!,
@@ -25,17 +24,28 @@ export default function CallbackReceiver() {
                 redirectUri: REDIRECT_URL,
             })
             .then((reddit) => {
-                console.log('TCL: CallbackReceiver -> reddit', reddit);
                 saveToken('reddit', reddit.accessToken);
-                history.push('/reddit');
+                history.replace('/reddit');
             })
             .catch((reason: any) => {
                 if (reason.toString().includes('invalid_grant')) {
                     // already grant authorization
-                    history.push('/reddit');
+                    history.replace('/reddit');
                 }
             });
     }, [history]);
 
-    return <div>CallbackReceiver</div>;
+    return (
+        <Box pt='10rem'>
+            <Heading as='h1' size='lg'>
+                You should not see this text
+            </Heading>
+            <Text mt='2rem' lineHeight='2'>
+                Something went wrong while redirecting you to the right page.
+                <br />
+                If you are using Firefox please turn off the anti-tracking
+                feature to solve this issue.
+            </Text>
+        </Box>
+    );
 }

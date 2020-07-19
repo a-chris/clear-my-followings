@@ -74,7 +74,8 @@ export default function Header() {
                 <Tooltip
                     closeOnClick
                     label='Change theme'
-                    aria-label='Change theme'>
+                    aria-label='Change theme'
+                    zIndex={200}>
                     <IconButton
                         variant='ghost'
                         aria-label='toggle color mode'
@@ -87,7 +88,8 @@ export default function Header() {
                 <Tooltip
                     closeOnClick
                     label='Visit the repository'
-                    aria-label='Visit the repository'>
+                    aria-label='Visit the repository'
+                    zIndex={200}>
                     <Link ml='20px' href={GITHUB_REPO} isExternal>
                         <Box as={AiFillGithub} size='32px' />
                     </Link>
