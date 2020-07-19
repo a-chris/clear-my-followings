@@ -8,6 +8,7 @@ import Header from 'components/Header';
 import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { useMedia } from 'react-use';
 import About from './pages/about/About';
 import Home from './pages/home/Home';
 import customTheme from './styles/theme';
@@ -17,10 +18,12 @@ const RedditFollowings = React.lazy(() =>
 );
 
 export default function App() {
+    const soTheme = useMedia('(prefers-color-scheme: dark)') ? 'dark' : 'light';
+
     return (
         <div className='App'>
             <ThemeProvider theme={customTheme}>
-                <ColorModeProvider>
+                <ColorModeProvider value={soTheme}>
                     <CSSReset />
                     <BrowserRouter>
                         <Header />
