@@ -41,6 +41,8 @@
         "no-use-before-define": "off",
         "no-array-constructor": "off",
         "no-nested-ternary": "off",
+        "no-param-reassign": "off",
+        "no-return-assign": "off",
         "prefer-destructuring": "off",
         "react/destructuring-assignment": "off",
         "react/jsx-indent": "off",
