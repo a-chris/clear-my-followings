@@ -1,4 +1,5 @@
 import {
+    Box,
     ColorModeProvider,
     CSSReset,
     Text,
@@ -34,7 +35,8 @@ export default function App() {
                     <CSSReset />
                     <BrowserRouter>
                         <Header />
-                        <div style={{ paddingTop: '80px' }}>
+
+                        <Box pt='90px'>
                             <Switch>
                                 <Route
                                     exact
@@ -54,7 +56,7 @@ export default function App() {
                                 <Route exact path='/about' component={About} />
                                 <Route component={Home} />
                             </Switch>
-                        </div>
+                        </Box>
                     </BrowserRouter>
                 </ColorModeProvider>
             </ThemeProvider>

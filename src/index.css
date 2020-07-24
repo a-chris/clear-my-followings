@@ -22,3 +22,13 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
         monospace;
 }
+
+*:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+label > * {
+    box-shadow: none !important;
+    outline: none !important;
+}

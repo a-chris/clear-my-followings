@@ -47,7 +47,11 @@ export default function Header() {
             alignItems='center'
             bg={colorMode === 'light' ? 'white' : 'gray.800'}
             zIndex={100}
-            boxShadow='0 0 5px rgba(57, 63, 72, 0.3)'>
+            boxShadow={
+                colorMode === 'light'
+                    ? '0 0 5px rgba(57, 63, 72, 0.3)'
+                    : `0 2px 5px ${colors.black_almost}`
+            }>
             <Breadcrumb fontWeight='medium' fontSize='md'>
                 {PAGES.map((page) => (
                     <BreadcrumbItem

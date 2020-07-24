@@ -8,26 +8,30 @@ import {
     Badge,
     Box,
     Button,
-    Checkbox,
     Flex,
     FormLabel,
     Heading,
+    Icon,
     Input,
+    InputGroup,
+    InputLeftElement,
     Link,
     Spinner,
     Stack,
     Switch,
     Text,
+    useColorMode,
     useToast,
 } from '@chakra-ui/core';
 import { BoxWithSpacedChildren } from 'components/Styled';
+import { BigCheckbox } from 'components/StyledComponents';
 import _ from 'lodash';
 import React from 'react';
 import LazyLoad from 'react-lazyload';
 import { useHistory } from 'react-router-dom';
 import { createBreakpoint, useSet } from 'react-use';
 import snoowrap from 'snoowrap';
-import colors from '../../styles/colors';
+import colors from 'styles/colors';
 import RedditAPI from './api';
 import {
     memoizedEllipseSubName,
@@ -238,10 +242,17 @@ export default function RedditFollowings() {
         <Stack d='flex' align='center'>
             <Box w={['90%', '70%', null, '50%']}>
                 <BoxWithSpacedChildren space='10px' pb='70px'>
-                    <Input
-                        placeholder='Filter subscriptions...'
-                        onChange={onSearchChange}
-                    />
+                    <InputGroup>
+                        <InputLeftElement>
+                            <Icon name='search' color='gray.400' />
+                        </InputLeftElement>
+                        <Input
+                            placeholder='Filter subscriptions...'
+                            rounded='50px'
+                            size='sm'
+                            onChange={onSearchChange}
+                        />
+                    </InputGroup>
                     <Accordion allowToggle defaultIndex={1}>
                         <AccordionItem defaultIsOpen={false}>
                             <AccordionHeader>
@@ -335,16 +346,19 @@ const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });
 const SubredditListItem = React.memo((props: SubredditListItemProps) => {
     const { sub } = props;
     const breakpoint = useBreakpoint();
+    const { colorMode } = useColorMode();
 
     return (
         <Flex
             w='100%'
             justifyContent='space-between'
             p='2'
-            pl={['3', null, '6']}
-            pr={['3', null, '6']}
-            border='1px solid gray'
-            rounded='md'
+            px='6'
+            // border='1px solid gray'
+            rounded='sm'
+            backgroundColor={
+                colorMode === 'light' ? 'gray.100' : colors.black_almost
+            }
             key={sub.name}>
             <Flex align='center'>
                 <LazyLoad once offset={0}>
@@ -371,14 +385,13 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
                     </Badge>
                 )}
             </Flex>
-            <Checkbox
+            <BigCheckbox
                 isChecked={props.isChecked}
-                variantColor='red'
+                vColor={colors.reddit_orange}
                 name={sub.display_name}
-                size={breakpoint === 'SM' ? 'md' : 'lg'}
                 w='fit-content'
-                mt='auto'
-                mb='auto'
+                my='auto'
+                breakpoint={breakpoint}
                 onChange={props.onCheckboxChange}
             />
         </Flex>
