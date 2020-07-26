@@ -1,0 +1,24 @@
+/* animations */
+.slide-enter {
+    opacity: 0;
+    transform: translateX(100px);
+}
+.slide-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: transform 500ms ease, opacity 500ms ease;
+}
+.slide-exit {
+    display: none;
+}
+.slide-exit-active {
+    display: none;
+}
+
+.zoom-enter {
+    transform: scale(0.1);
+}
+.zoom-enter-active {
+    transform: scale(1);
+    transition: transform 500ms ease;
+}

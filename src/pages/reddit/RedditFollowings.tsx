@@ -27,11 +27,11 @@ import { BoxWithSpacedChildren } from 'components/Styled';
 import { BigCheckbox } from 'components/StyledComponents';
 import _ from 'lodash';
 import React from 'react';
-import LazyLoad from 'react-lazyload';
 import { useHistory } from 'react-router-dom';
 import { createBreakpoint, useSet } from 'react-use';
 import snoowrap from 'snoowrap';
 import colors from 'styles/colors';
+import { BadgeContainer } from '../../components/StyledComponents';
 import RedditAPI from './api';
 import {
     memoizedEllipseSubName,
@@ -60,6 +60,7 @@ const initialFilters: RedditFilters = {
 export default function RedditFollowings() {
     const history = useHistory();
     const toast = useToast();
+    const { colorMode } = useColorMode();
     const [subs, setSubs] = React.useState<snoowrap.Subreddit[]>();
     const [isLoading, setLoading] = React.useState(false);
     const [filters, setFilters] = React.useState<RedditFilters>(initialFilters);
@@ -86,7 +87,8 @@ export default function RedditFollowings() {
     }, [history, toast]);
 
     React.useEffect(() => {
-        // store.subs = (devSubs as unknown) as snoowrap.Subreddit[];
+        // const dSubs = (devSubs as unknown) as snoowrap.Subreddit[];
+        // setSubs(_.sortBy(dSubs, 'display_name_prefixed'));
         const getSubscriptions = async () => {
             setLoading(true);
             try {
@@ -241,7 +243,7 @@ export default function RedditFollowings() {
     return (
         <Stack d='flex' align='center'>
             <Box w={['90%', '70%', null, '50%']}>
-                <BoxWithSpacedChildren space='10px' pb='70px'>
+                <BoxWithSpacedChildren space='10px' pb='30px'>
                     <InputGroup>
                         <InputLeftElement>
                             <Icon name='search' color='gray.400' />
@@ -296,11 +298,11 @@ export default function RedditFollowings() {
                         </Flex>
                     ) : (
                         <>
-                            {subsToDisplay.map((s) => (
+                            {subsToDisplay.map((sub) => (
                                 <SubredditListItem
-                                    key={s.name}
-                                    sub={s}
-                                    isChecked={hasCS(s.display_name)}
+                                    key={sub.display_name}
+                                    sub={sub}
+                                    isChecked={hasCS(sub.display_name)}
                                     onCheckboxChange={onCheckboxChange}
                                 />
                             ))}
@@ -309,26 +311,55 @@ export default function RedditFollowings() {
                 </BoxWithSpacedChildren>
             </Box>
             <Flex
+                flexShrink={0}
                 align='center'
-                position='fixed'
+                position='sticky'
                 bottom='0'
+                mt='auto'
                 w='100%'
                 h='50px'
                 backgroundColor='orange.400'
                 zIndex={100}>
                 <Flex justify='space-evenly' w='100%'>
-                    <Button size='sm' onClick={onSelectAll}>
-                        SELECT ALL
-                    </Button>
-                    <Button size='sm' onClick={onUnselectAll}>
-                        UNSELECT ALL
-                    </Button>
-                    <Button
-                        size='sm'
-                        isDisabled={checkedSubs.size === 0}
-                        onClick={onStopFollowing}>
-                        STOP FOLLOWING
-                    </Button>
+                    <Flex>
+                        <Button
+                            size='sm'
+                            rounded='md'
+                            variant='outline'
+                            variantColor='black'
+                            _hover={{
+                                backgroundColor:
+                                    colorMode === 'light' ? 'white' : 'black',
+                            }}
+                            onClick={onSelectAll}>
+                            SELECT ALL
+                        </Button>
+                        <Box w='20px' />
+                        <Button
+                            size='sm'
+                            rounded='md'
+                            variant='outline'
+                            variantColor='black'
+                            _hover={{
+                                backgroundColor:
+                                    colorMode === 'light' ? 'white' : 'black',
+                            }}
+                            onClick={onUnselectAll}>
+                            UNSELECT ALL
+                        </Button>
+                    </Flex>
+                    <BadgeContainer badge={checkedSubs.size}>
+                        <Button
+                            size='sm'
+                            rounded='md'
+                            variant='outline'
+                            variantColor='black'
+                            _hover={{ backgroundColor: 'red.500' }}
+                            isDisabled={checkedSubs.size === 0}
+                            onClick={onStopFollowing}>
+                            STOP FOLLOWING
+                        </Button>
+                    </BadgeContainer>
                 </Flex>
             </Flex>
         </Stack>
@@ -354,21 +385,18 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
             justifyContent='space-between'
             p='2'
             px='6'
-            // border='1px solid gray'
             rounded='sm'
             backgroundColor={
                 colorMode === 'light' ? 'gray.100' : colors.black_almost
             }
             key={sub.name}>
             <Flex align='center'>
-                <LazyLoad once offset={0}>
-                    <Avatar
-                        src={sub.icon_img}
-                        name={sub.display_name_prefixed}
-                        size='md'
-                        mr={['10px', null, '20px']}
-                    />
-                </LazyLoad>
+                <Avatar
+                    src={sub.icon_img}
+                    name={sub.display_name_prefixed}
+                    size='md'
+                    mr={['10px', null, '20px']}
+                />
                 <Heading as='h3' size={breakpoint === 'SM' ? 'sm' : 'md'}>
                     <Link
                         href={memoizedGetSubLink(sub.display_name)}
@@ -386,12 +414,13 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
                 )}
             </Flex>
             <BigCheckbox
+                w='fit-content'
+                breakpoint={breakpoint}
                 isChecked={props.isChecked}
                 vColor={colors.reddit_orange}
-                name={sub.display_name}
-                w='fit-content'
                 my='auto'
-                breakpoint={breakpoint}
+                borderColor='lightslategray'
+                name={sub.display_name}
                 onChange={props.onCheckboxChange}
             />
         </Flex>

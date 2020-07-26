@@ -42,8 +42,9 @@ export default function Header() {
         <Flex
             h='80px'
             w='100%'
-            position='fixed'
+            position='sticky'
             justifyContent='space-evenly'
+            top='0'
             alignItems='center'
             bg={colorMode === 'light' ? 'white' : 'gray.800'}
             zIndex={100}
