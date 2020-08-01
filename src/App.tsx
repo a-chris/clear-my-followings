@@ -5,7 +5,6 @@ import {
     Text,
     ThemeProvider,
 } from '@chakra-ui/core';
-import 'animate.css/animate.css';
 import Header from 'components/Header';
 import About from 'pages/about/About';
 import Home from 'pages/home/Home';
@@ -13,9 +12,10 @@ import CallbackReceiver from 'pages/reddit/CallbackReceiver';
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useMedia } from 'react-use';
+import { createBreakpoint, useMedia } from 'react-use';
 import styled from 'styled-components';
 import customTheme from 'styles/theme';
+import { THEME } from './utils/theme';
 
 const RedditFollowings = React.lazy(() =>
     import('pages/reddit/RedditFollowings')
@@ -23,13 +23,15 @@ const RedditFollowings = React.lazy(() =>
 
 if (process.env.NODE_ENV === 'development') {
     const whyDidYouRender = require('@welldone-software/why-did-you-render');
-    whyDidYouRender(React, {
-        trackAllPureComponents: true,
-    });
+    whyDidYouRender(React);
 }
 
+export const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });
+
 export default function App() {
-    const soTheme = useMedia('(prefers-color-scheme: dark)') ? 'dark' : 'light';
+    const soTheme = useMedia('(prefers-color-scheme: dark)')
+        ? THEME.DARK
+        : THEME.LIGHT;
 
     return (
         <div className='App'>

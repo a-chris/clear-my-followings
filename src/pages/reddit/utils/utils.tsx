@@ -1,4 +1,5 @@
 import memoizeOne from 'memoize-one';
+import snoowrap from 'snoowrap';
 
 export const memoizedGetSubLink = memoizeOne((subName: string): string => {
     const profile = subName.startsWith('u_')
@@ -22,3 +23,7 @@ export const memoizedEllipseSubName = memoizeOne(
             : subName;
     }
 );
+
+export const memoizedFilterUser = memoizeOne((sub: snoowrap.Subreddit) => {
+    return sub.display_name.startsWith('u_');
+});

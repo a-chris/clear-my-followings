@@ -30,7 +30,7 @@ type BadgeContainerProps = {
 
 export function BadgeContainer(props: BadgeContainerProps) {
     const badgeVisible = props.badge != null && props.badge > 0;
-    console.log('TCL: BadgeContainer -> badgeVisible', badgeVisible);
+
     return (
         <Flex direction='row-reverse'>
             <CSSTransition

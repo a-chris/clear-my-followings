@@ -8,11 +8,13 @@ import {
     ListIcon,
     ListItem,
 } from '@chakra-ui/core';
+import { loadToken } from 'cache/StorageHelper';
 import React from 'react';
 import { AiFillGithub } from 'react-icons/ai';
 import { FaReact } from 'react-icons/fa';
 import { FiMinimize2 } from 'react-icons/fi';
 import { RiTimeLine } from 'react-icons/ri';
+import { Link as RouterLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { GITHUB_REPO, REDDIT_LOGIN } from '../../utils/const';
 
@@ -21,9 +23,9 @@ export default function Home() {
         <Box pt={['20px', '40px', '60px']}>
             <Box ml='auto' mr='auto' w='fit-content' maxW='80%'>
                 <Heading as='h1' fontSize='xl' lineHeight='1.5'>
-                    <span style={{ fontSize: '4rem', lineHeight: '1' }}>F</span>
-                    ind inactive and deleted users <DesktopBr />
-                    to clear your Reddit followings!
+                    <span style={{ fontSize: '4rem', fontFamily: 'monospace' }}>
+                        Clear my followings!
+                    </span>
                 </Heading>
             </Box>
             <Box
@@ -58,28 +60,36 @@ export default function Home() {
                         </Link>
                     </ListItem>
                 </List>
-                <Button
-                    variant='solid'
-                    variantColor='orange'
-                    color='black'
-                    mt={['20px', null, '60px']}>
-                    <Link
-                        href={REDDIT_LOGIN}
-                        _hover={undefined}
-                        _focus={undefined}>
-                        Login with Reddit
-                    </Link>
-                </Button>
+                <RedditButton />
             </Box>
         </Box>
     );
 }
 
-const DesktopBr = styled.br`
-    @media (max-width: 500px) {
-        display: none;
-    }
-`;
+function RedditButton() {
+    const button = (text: string) => (
+        <Button
+            variant='solid'
+            variantColor='orange'
+            color='black'
+            width='10rem'
+            mt={['20px', null, '60px']}>
+            {text}
+        </Button>
+    );
+
+    return (
+        <>
+            {loadToken('reddit') != null ? (
+                <RouterLink to='/reddit'>{button('Reddit')}</RouterLink>
+            ) : (
+                <Link href={REDDIT_LOGIN} _hover={undefined} _focus={undefined}>
+                    {button('Login with Reddit')}
+                </Link>
+            )}
+        </>
+    );
+}
 
 const StyledListIcon = styled(ListIcon).attrs({
     size: '20px',

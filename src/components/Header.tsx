@@ -16,6 +16,7 @@ import { FiMoon, FiSun } from 'react-icons/fi';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import colors from 'styles/colors';
 import { GITHUB_REPO } from 'utils/const';
+import { THEME } from '../utils/theme';
 
 const PAGES = [
     {
@@ -46,10 +47,10 @@ export default function Header() {
             justifyContent='space-evenly'
             top='0'
             alignItems='center'
-            bg={colorMode === 'light' ? 'white' : 'gray.800'}
+            bg={colorMode === THEME.LIGHT ? 'white' : 'gray.800'}
             zIndex={100}
             boxShadow={
-                colorMode === 'light'
+                colorMode === THEME.LIGHT
                     ? '0 0 5px rgba(57, 63, 72, 0.3)'
                     : `0 2px 5px ${colors.black_almost}`
             }>
@@ -86,7 +87,7 @@ export default function Header() {
                         aria-label='toggle color mode'
                         isRound
                         size='md'
-                        icon={colorMode === 'light' ? FiMoon : FiSun}
+                        icon={colorMode === THEME.LIGHT ? FiMoon : FiSun}
                         onClick={toggleColorMode}
                     />
                 </Tooltip>

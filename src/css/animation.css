@@ -22,3 +22,6 @@
     transform: scale(1);
     transition: transform 500ms ease;
 }
+.zoom-exit-active {
+    display: none;
+}
