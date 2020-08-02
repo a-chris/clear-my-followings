@@ -28,7 +28,12 @@ export default function ConfirmDialog(props: ConfirmDialogProps) {
     return (
         <>
             {props.trigger(onOpen)}
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal
+                size='sm'
+                isCentered
+                closeOnOverlayClick={false}
+                isOpen={isOpen}
+                onClose={onClose}>
                 <ModalOverlay />
                 <ModalContent borderRadius='5px'>
                     <ModalHeader>Clear my followings</ModalHeader>

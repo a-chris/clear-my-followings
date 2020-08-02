@@ -7,7 +7,6 @@ import {
     Avatar,
     Badge,
     Box,
-    Button,
     Flex,
     FormLabel,
     Heading,
@@ -23,25 +22,19 @@ import {
     useColorMode,
     useToast,
 } from '@chakra-ui/core';
+import { useBreakpoint } from 'App';
 import { deleteToken } from 'cache/StorageHelper';
-import ConfirmDialog from 'components/ConfirmDialog';
+import ListFooter from 'components/ListFooter';
 import { BoxWithSpacedChildren } from 'components/Styled';
 import { BigCheckbox } from 'components/StyledComponents';
 import _ from 'lodash';
 import React from 'react';
-import {
-    MdCheckBox,
-    MdCheckBoxOutlineBlank,
-    MdIndeterminateCheckBox,
-} from 'react-icons/md';
 import { queryCache, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { useSet } from 'react-use';
 import snoowrap from 'snoowrap';
 import colors from 'styles/colors';
-import { useBreakpoint } from '../../App';
-import { BadgeContainer } from '../../components/StyledComponents';
-import { byColorMode, THEME } from '../../utils/theme';
+import { byColorMode } from 'utils/theme';
 import RedditAPI from './api';
 import {
     memoizedEllipseSubName,
@@ -330,79 +323,14 @@ export default function RedditFollowings() {
                     )}
                 </BoxWithSpacedChildren>
             </Box>
-            <Flex
-                flexShrink={0}
-                align='center'
-                position='sticky'
-                bottom='0'
-                mt='auto'
-                w='100%'
-                h='50px'
-                backgroundColor='orange.400'
-                zIndex={100}>
-                <Flex justify='space-evenly' w='100%'>
-                    <SelectAllButton
-                        total={subsToDisplay.length}
-                        selected={checkedSubs.size}
-                        onSelectAll={onSelectAll}
-                        onUnselectAll={onUnselectAll}
-                    />
-                    <ConfirmDialog
-                        onConfirm={onStopFollowing}
-                        trigger={(onClick) => (
-                            <BadgeContainer badge={checkedSubs.size}>
-                                <Button
-                                    size='sm'
-                                    rounded='md'
-                                    variant='outline'
-                                    variantColor='black'
-                                    _hover={{ backgroundColor: 'red.500' }}
-                                    isDisabled={checkedSubs.size === 0}
-                                    onClick={onClick}>
-                                    STOP FOLLOWING
-                                </Button>
-                            </BadgeContainer>
-                        )}
-                    />
-                </Flex>
-            </Flex>
+            <ListFooter
+                totalItemsCount={subsToDisplay.length}
+                selectedItemsCount={checkedSubs.size}
+                onSelectAll={onSelectAll}
+                onUnselectAll={onUnselectAll}
+                onStopFollowing={onStopFollowing}
+            />
         </Stack>
-    );
-}
-
-interface SelectAllButtonProps {
-    total: number;
-    selected: number;
-    onSelectAll: () => void;
-    onUnselectAll: () => void;
-}
-
-function SelectAllButton(props: SelectAllButtonProps) {
-    const { colorMode } = useColorMode();
-
-    let icon = MdCheckBoxOutlineBlank;
-    if (props.selected > 0 && props.selected < props.total) {
-        icon = MdIndeterminateCheckBox;
-    } else if (props.total !== 0 && props.selected === props.total) {
-        icon = MdCheckBox;
-    }
-
-    return (
-        <Button
-            size='sm'
-            rounded='md'
-            variant='outline'
-            variantColor='black'
-            _hover={{
-                backgroundColor: colorMode === THEME.LIGHT ? 'white' : 'black',
-            }}
-            iconSpacing='0.2rem'
-            leftIcon={icon}
-            onClick={
-                props.selected > 0 ? props.onUnselectAll : props.onSelectAll
-            }>
-            UNSELECT ALL
-        </Button>
     );
 }
 
