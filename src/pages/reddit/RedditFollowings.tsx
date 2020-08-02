@@ -7,7 +7,6 @@ import {
     Avatar,
     Badge,
     Box,
-    Button,
     Flex,
     FormLabel,
     Heading,
@@ -23,18 +22,23 @@ import {
     useColorMode,
     useToast,
 } from '@chakra-ui/core';
+import { useBreakpoint } from 'App';
+import { deleteToken } from 'cache/StorageHelper';
+import ListFooter from 'components/ListFooter';
 import { BoxWithSpacedChildren } from 'components/Styled';
 import { BigCheckbox } from 'components/StyledComponents';
 import _ from 'lodash';
 import React from 'react';
-import LazyLoad from 'react-lazyload';
+import { queryCache, useMutation, useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import { createBreakpoint, useSet } from 'react-use';
+import { useSet } from 'react-use';
 import snoowrap from 'snoowrap';
 import colors from 'styles/colors';
+import { byColorMode } from 'utils/theme';
 import RedditAPI from './api';
 import {
     memoizedEllipseSubName,
+    memoizedFilterUser,
     memoizedGetSubLink,
     memoizedGetSubName,
 } from './utils/utils';
@@ -60,7 +64,6 @@ const initialFilters: RedditFilters = {
 export default function RedditFollowings() {
     const history = useHistory();
     const toast = useToast();
-    const [subs, setSubs] = React.useState<snoowrap.Subreddit[]>();
     const [isLoading, setLoading] = React.useState(false);
     const [filters, setFilters] = React.useState<RedditFilters>(initialFilters);
     const [search, setSearch] = React.useState('');
@@ -70,12 +73,14 @@ export default function RedditFollowings() {
     const [inactiveUsers, setInactiveUsers] = React.useState<Set<string>>(
         new Set()
     );
-    const [checkedSubs, { add: addCS, has: hasCS, remove: removeCS }] = useSet<
-        string
-    >(new Set());
+    const [
+        checkedSubs,
+        { add: addCS, has: hasCS, remove: removeCS, reset: clearCS },
+    ] = useSet<string>(new Set());
 
     const onUnauthorizedError = React.useCallback(() => {
         history.push('/');
+        deleteToken('reddit');
         toast({
             position: 'bottom-right',
             title: 'Ops, something went wrong',
@@ -85,26 +90,56 @@ export default function RedditFollowings() {
         });
     }, [history, toast]);
 
+    const { isLoading: isLoadingSubs, data: subs } = useQuery<
+        snoowrap.Subreddit[],
+        any
+    >(
+        'fetchSubs',
+        async () => {
+            const response = await RedditAPI.get()
+                .getSubscriptions()
+                .fetchAll();
+            return _.sortBy(response, 'display_name_prefixed');
+        },
+        {
+            retry: false,
+            refetchOnMount: false,
+            staleTime: Infinity,
+            onError: onUnauthorizedError,
+        }
+    );
+
     React.useEffect(() => {
-        // store.subs = (devSubs as unknown) as snoowrap.Subreddit[];
-        const getSubscriptions = async () => {
-            setLoading(true);
-            try {
-                const fetchedSubs = await RedditAPI.get()
-                    .getSubscriptions()
-                    .fetchAll();
-                setSubs(_.sortBy(fetchedSubs, 'display_name_prefixed'));
-            } catch (error) {
-                onUnauthorizedError();
-            } finally {
-                setLoading(false);
-            }
-        };
-        getSubscriptions();
-    }, [onUnauthorizedError]);
+        setLoading(isLoadingSubs);
+    }, [isLoadingSubs]);
+
+    const stopFollowing = async () => {
+        const unfollowedSubs = await Promise.all(
+            [...checkedSubs].map((sub) =>
+                RedditAPI.get()
+                    .getSubreddit(memoizedGetSubName(sub))
+                    .unsubscribe()
+            )
+        );
+        return unfollowedSubs;
+    };
+
+    const [onStopFollowing] = useMutation(stopFollowing, {
+        onSuccess: (unfollowedSubs) => {
+            queryCache.setQueryData(
+                'fetchSubs',
+                _.differenceWith(
+                    subs,
+                    unfollowedSubs,
+                    (s1, s2) => s1.display_name === s2.display_name
+                )
+            );
+            clearCS();
+        },
+        onError: () => history.push('/'),
+    });
 
     const subsToDisplay: snoowrap.Subreddit[] = React.useMemo(() => {
-        console.count();
         let filteredSubs = Array.from(subs ?? []);
         if (search !== '') {
             filteredSubs = filteredSubs.filter((s: snoowrap.Subreddit) =>
@@ -131,18 +166,18 @@ export default function RedditFollowings() {
         });
     }, [filters, isLoading, search, disabledUsers, inactiveUsers, subs]);
 
-    const toggleNsfw = React.useCallback(() => {
+    const onToggleNsfw = React.useCallback(() => {
         setFilters((curr) => ({ ...curr, nsfw: !curr.nsfw }));
     }, []);
 
-    const toggleDisabled = React.useCallback(() => {
+    const onToggleDisabled = React.useCallback(() => {
         if (isLoading) return;
 
         setFilters((curr) => ({ ...curr, disabled: !curr.disabled }));
-        if (filters.disabled) {
+        if (!filters.disabled) {
             setLoading(true);
             const users = subsToDisplay
-                .filter((sub) => sub.display_name.startsWith('u_'))
+                .filter(memoizedFilterUser)
                 .map((u) => u.display_name);
 
             RedditAPI.findDisabledUsers(users)
@@ -154,27 +189,23 @@ export default function RedditFollowings() {
         }
     }, [filters.disabled, isLoading, onUnauthorizedError, subsToDisplay]);
 
-    const toggleInactive = React.useCallback(() => {
+    const onToggleInactive = React.useCallback(() => {
         if (isLoading) return;
 
+        setFilters((curr) => ({ ...curr, inactive: !curr.inactive }));
         if (!filters.inactive) {
             setLoading(true);
+            const users = subsToDisplay
+                .filter((sub) => sub.display_name.startsWith('u_'))
+                .map((u) => u.display_name);
+            RedditAPI.findInactiveUsers(users)
+                .then((inaUsers) => {
+                    setLoading(false);
+                    setInactiveUsers(inaUsers);
+                })
+                .catch(onUnauthorizedError);
         }
-        setFilters((curr) => ({ ...curr, inactive: !curr.inactive }));
-        const users = subsToDisplay
-            .filter((sub) => sub.display_name.startsWith('u_'))
-            .map((u) => u.display_name);
-        RedditAPI.findInactiveUsers(users)
-            .then((inaUsers) => {
-                setLoading(false);
-                setInactiveUsers(inaUsers);
-            })
-            .catch(onUnauthorizedError);
     }, [filters.inactive, isLoading, onUnauthorizedError, subsToDisplay]);
-
-    const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value ?? '');
-    };
 
     const onSelectAll = React.useCallback(() => {
         // eslint-disable-next-line no-unused-expressions
@@ -186,62 +217,46 @@ export default function RedditFollowings() {
         subsToDisplay?.map((s) => s.display_name).forEach((s) => removeCS(s));
     }, [removeCS, subsToDisplay]);
 
-    const onStopFollowing = React.useCallback(() => {
-        const subNames = Array.from(checkedSubs).map(memoizedGetSubName);
-
-        Promise.all(
-            Array.from(subNames).map((sub) =>
-                RedditAPI.get().getSubreddit(sub).unsubscribe()
-            )
-        )
-            .then((unfollowedSubs) => {
-                setSubs((curr) =>
-                    _.differenceWith(
-                        curr,
-                        unfollowedSubs,
-                        (s1, s2) => s1.display_name === s2.display_name
-                    )
-                );
-            })
-            .catch(() => history.push('/'));
-    }, [checkedSubs, history]);
-
     const onCheckboxChange = React.useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const { checked, name } = e.target;
             if (checked != null && name != null) {
-                if (checked) {
-                    addCS(name);
-                } else {
-                    removeCS(name);
-                }
+                if (checked) addCS(name);
+                else removeCS(name);
             }
         },
         [addCS, removeCS]
     );
 
+    const onSearchChange = React.useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setSearch(e.target.value ?? '');
+        },
+        []
+    );
+
     const FILTERS: RedditSwitchFilter[] = [
         {
-            text: 'NSFW',
+            text: 'NSFW only',
             id: 'nsfw',
-            onChange: toggleNsfw,
+            onChange: onToggleNsfw,
         },
         {
             text: 'Users disabled',
             id: 'disabled',
-            onChange: toggleDisabled,
+            onChange: onToggleDisabled,
         },
         {
             text: 'Inactive since 6 months',
             id: 'inactive',
-            onChange: toggleInactive,
+            onChange: onToggleInactive,
         },
     ];
 
     return (
         <Stack d='flex' align='center'>
             <Box w={['90%', '70%', null, '50%']}>
-                <BoxWithSpacedChildren space='10px' pb='70px'>
+                <BoxWithSpacedChildren space='10px' pb='30px'>
                     <InputGroup>
                         <InputLeftElement>
                             <Icon name='search' color='gray.400' />
@@ -296,11 +311,11 @@ export default function RedditFollowings() {
                         </Flex>
                     ) : (
                         <>
-                            {subsToDisplay.map((s) => (
+                            {subsToDisplay.map((sub) => (
                                 <SubredditListItem
-                                    key={s.name}
-                                    sub={s}
-                                    isChecked={hasCS(s.display_name)}
+                                    key={sub.display_name}
+                                    sub={sub}
+                                    isChecked={hasCS(sub.display_name)}
                                     onCheckboxChange={onCheckboxChange}
                                 />
                             ))}
@@ -308,29 +323,13 @@ export default function RedditFollowings() {
                     )}
                 </BoxWithSpacedChildren>
             </Box>
-            <Flex
-                align='center'
-                position='fixed'
-                bottom='0'
-                w='100%'
-                h='50px'
-                backgroundColor='orange.400'
-                zIndex={100}>
-                <Flex justify='space-evenly' w='100%'>
-                    <Button size='sm' onClick={onSelectAll}>
-                        SELECT ALL
-                    </Button>
-                    <Button size='sm' onClick={onUnselectAll}>
-                        UNSELECT ALL
-                    </Button>
-                    <Button
-                        size='sm'
-                        isDisabled={checkedSubs.size === 0}
-                        onClick={onStopFollowing}>
-                        STOP FOLLOWING
-                    </Button>
-                </Flex>
-            </Flex>
+            <ListFooter
+                totalItemsCount={subsToDisplay.length}
+                selectedItemsCount={checkedSubs.size}
+                onSelectAll={onSelectAll}
+                onUnselectAll={onUnselectAll}
+                onStopFollowing={onStopFollowing}
+            />
         </Stack>
     );
 }
@@ -341,10 +340,8 @@ interface SubredditListItemProps {
     onCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });
-
 const SubredditListItem = React.memo((props: SubredditListItemProps) => {
-    const { sub } = props;
+    const { sub, isChecked, onCheckboxChange } = props;
     const breakpoint = useBreakpoint();
     const { colorMode } = useColorMode();
 
@@ -354,21 +351,20 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
             justifyContent='space-between'
             p='2'
             px='6'
-            // border='1px solid gray'
             rounded='sm'
-            backgroundColor={
-                colorMode === 'light' ? 'gray.100' : colors.black_almost
-            }
+            backgroundColor={byColorMode(
+                colorMode,
+                'gray.100',
+                colors.black_almost
+            )}
             key={sub.name}>
             <Flex align='center'>
-                <LazyLoad once offset={0}>
-                    <Avatar
-                        src={sub.icon_img}
-                        name={sub.display_name_prefixed}
-                        size='md'
-                        mr={['10px', null, '20px']}
-                    />
-                </LazyLoad>
+                <Avatar
+                    src={sub.icon_img}
+                    name={sub.display_name_prefixed}
+                    size='md'
+                    mr={['10px', null, '20px']}
+                />
                 <Heading as='h3' size={breakpoint === 'SM' ? 'sm' : 'md'}>
                     <Link
                         href={memoizedGetSubLink(sub.display_name)}
@@ -386,13 +382,14 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
                 )}
             </Flex>
             <BigCheckbox
-                isChecked={props.isChecked}
-                vColor={colors.reddit_orange}
-                name={sub.display_name}
                 w='fit-content'
-                my='auto'
                 breakpoint={breakpoint}
-                onChange={props.onCheckboxChange}
+                isChecked={isChecked}
+                vColor={colors.reddit_orange}
+                my='auto'
+                borderColor='lightslategray'
+                name={sub.display_name}
+                onChange={onCheckboxChange}
             />
         </Flex>
     );

@@ -3,6 +3,9 @@ body,
 #root,
 .App {
     height: 100%;
+
+    /* hides for animations */
+    overflow-x: hidden;
 }
 
 .App {
@@ -16,19 +19,4 @@ body {
         'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-        monospace;
-}
-
-*:focus {
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-label > * {
-    box-shadow: none !important;
-    outline: none !important;
 }

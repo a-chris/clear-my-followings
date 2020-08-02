@@ -1,0 +1,10 @@
+/* improves Chakra-UI styles */
+*:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+label > * {
+    box-shadow: none !important;
+    outline: none !important;
+}
