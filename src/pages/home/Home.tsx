@@ -45,12 +45,11 @@ export default function Home() {
                     </ListItem>
                     <ListItem>
                         <StyledListIcon icon={FiMinimize2} />
-                        Only the minimum amount of account permissions is
-                        required
+                        Minimum amount of permissions required
                     </ListItem>
                     <ListItem>
                         <StyledListIcon icon={RiTimeLine} />
-                        The permissions lasts just an hour
+                        Permissions last just for an hour
                     </ListItem>
                     <ListItem>
                         <StyledListIcon icon={AiFillGithub} />
