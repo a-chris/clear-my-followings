@@ -3,7 +3,7 @@ import {
     ColorModeProvider,
     CSSReset,
     Text,
-    ThemeProvider,
+    ThemeProvider
 } from '@chakra-ui/core';
 import Header from 'components/Header';
 import About from 'pages/about/About';
@@ -20,11 +20,6 @@ import { THEME } from './utils/theme';
 const RedditFollowings = React.lazy(() =>
     import('pages/reddit/RedditFollowings')
 );
-
-if (process.env.NODE_ENV === 'development') {
-    const whyDidYouRender = require('@welldone-software/why-did-you-render');
-    whyDidYouRender(React);
-}
 
 export const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });
 

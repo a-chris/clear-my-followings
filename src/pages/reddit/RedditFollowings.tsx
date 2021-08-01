@@ -394,5 +394,3 @@ const SubredditListItem = React.memo((props: SubredditListItemProps) => {
         </Flex>
     );
 });
-
-RedditFollowings.whyDidYouRender = true;

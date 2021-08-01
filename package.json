@@ -7,7 +7,6 @@
         "@emotion/core": "^10.0.28",
         "@emotion/styled": "^10.0.27",
         "@types/react-query": "^1.1.2",
-        "@welldone-software/why-did-you-render": "^4.2.6",
         "axios": "^0.19.2",
         "emotion-theming": "^10.0.27",
         "history": "^5.0.0",
