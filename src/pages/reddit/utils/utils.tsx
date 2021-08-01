@@ -9,11 +9,9 @@ export const memoizedGetSubLink = memoizeOne((subName: string): string => {
     return `https://www.reddit.com/${profile}`;
 });
 
-export const memoizedGetSubName = memoizeOne((displayName: string): string => {
-    return displayName.startsWith('u_')
-        ? displayName.substring(2)
-        : displayName;
-});
+export const memoizedGetSubName = memoizeOne((displayName: string): string =>
+    displayName.startsWith('u_') ? displayName.substring(2) : displayName
+);
 
 export const memoizedEllipseSubName = memoizeOne(
     (subName: string, nsfw: boolean): string => {
@@ -24,6 +22,6 @@ export const memoizedEllipseSubName = memoizeOne(
     }
 );
 
-export const memoizedFilterUser = memoizeOne((sub: snoowrap.Subreddit) => {
-    return sub.display_name.startsWith('u_');
-});
+export const memoizedFilterUser = memoizeOne((sub: snoowrap.Subreddit) =>
+    sub.display_name.startsWith('u_')
+);

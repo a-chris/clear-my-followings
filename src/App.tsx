@@ -3,7 +3,7 @@ import {
     ColorModeProvider,
     CSSReset,
     Text,
-    ThemeProvider
+    ThemeProvider,
 } from '@chakra-ui/core';
 import Header from 'components/Header';
 import About from 'pages/about/About';
@@ -17,8 +17,8 @@ import styled from 'styled-components';
 import customTheme from 'styles/theme';
 import { THEME } from './utils/theme';
 
-const RedditFollowings = React.lazy(() =>
-    import('pages/reddit/RedditFollowings')
+const RedditFollowings = React.lazy(
+    () => import('pages/reddit/RedditFollowings')
 );
 
 export const useBreakpoint = createBreakpoint({ XL: 1280, L: 768, SM: 350 });

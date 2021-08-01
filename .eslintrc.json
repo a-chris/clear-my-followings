@@ -3,10 +3,12 @@
         "browser": true,
         "es6": true
     },
-    "extends": ["airbnb", "prettier", "prettier/react"],
+    "extends": ["airbnb", "prettier"],
     "globals": {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
+        "React": true,
+        "JSX": true
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -35,6 +37,7 @@
         "new-cap": "off",
         "no-plusplus": "off",
         "no-bitwise": "off",
+        "no-shadow": "off",
         "implicit-arrow-linebreak": "off",
         "no-confusing-arrow": "off",
         "no-unused-vars": "warn",
@@ -48,7 +51,8 @@
         "react/jsx-indent": "off",
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
-        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }]
+        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }],
+        "react/require-default-props": "off"
     },
     "settings": {
         "import/extensions": [".js", ".jsx", ".ts", ".tsx"],
